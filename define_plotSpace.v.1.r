@@ -38,7 +38,7 @@ define_plotSpace <- function(func_subDivs, func_tmpSpace = c(0,1),func_tmpBuffer
 	names(func_tmpDivs) <- if(is.matrix(func_subDivs) || is.data.frame(func_subDivs)){
 								as.character(unique(func_subDivs[,1]))
 							} else {
-								unique(names(func_subDivs))
+								as.character(unique(func_subDivs))
 							}
 	# Using the scale of space we've been given, we'll divide it by the nunber of unique instances in the first
 	# column of func_subDivs (or if it's a vector simply by that value alone)
@@ -56,6 +56,7 @@ define_plotSpace <- function(func_subDivs, func_tmpSpace = c(0,1),func_tmpBuffer
 													func_tmpBuffer_min = func_tmpBuffer_min,
 													func_orderDivs = func_orderDivs)
 								})
+		names(func_tmpReturn) <- names(func_tmpDivs)
 		return( func_tmpReturn )
 	} else {
 		# This mean's we're on the last element of the divisions and we can return the divisions that we've defined
