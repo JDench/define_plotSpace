@@ -14,27 +14,21 @@ define_plotSpace <- function(func_subDivs, func_tmpSpace = c(0,1),func_tmpBuffer
 						seq(func_tmpSpace[1], func_tmpSpace[2],length.out = length(unique(func_subDivs))+1)
 					}
 	# Now to define the actual space permissable we create space sets for all but the first and last elements, which are the boundary points.
-	func_tmpDivs <- lapply(1:(length(func_tmpDivs)-1),function(func_thisSpace){ 
+	# EXCEPT: If we're plotting beside AND this is the most nested set (which means it's been passed as a vector)
+	func_tmpDivs <- if(!is.matrix(func_subDivs) && !is.data.frame(func_subDivs) && func_pairsBeside){
+						lapply(1:(length(func_tmpDivs)-1),function(func_thisSpace){
+								# This is then just the space between points.
+								c(func_tmpDivs[func_thisSpace], func_tmpDivs[func_thisSpace+1])
+							})
+					} else {
+						lapply(1:(length(func_tmpDivs)-1),function(func_thisSpace){ 
 								# We find the space that could be occupied
 								func_tmpSpace <- c(func_tmpDivs[func_thisSpace],func_tmpDivs[func_thisSpace+1])
 								# So the actual space we'll return as permissible will be these boundaries, with trim of total space
-								# BUT, if we're supposed to not have paired groups split apart, then we adjust how this value is calculated
-								if (!is.matrix(func_subDivs) && !is.data.frame(func_subDivs) && func_pairsBeside){
-									# Then the only values that get trimmed are the first and last
-									if(func_thisSpace == 1){
-										c(func_tmpSpace[1] + max(func_tmpBuffer_min, min(func_tmpBuffer_max,(func_tmpBuffer * (func_tmpSpace[2]-func_tmpSpace[1])))), 
-												func_tmpSpace[2])
-									} else if(func_thisSpace == (length(func_tmpDivs)-1)){
-										c(func_tmpSpace[1],
-											func_tmpSpace[2] - max(func_tmpBuffer_min, min(func_tmpBuffer_max,(func_tmpBuffer * (func_tmpSpace[2]-func_tmpSpace[1])))))
-									} else {
-										func_tmpSpace
-									}
-								} else {
-									return( c(func_tmpSpace[1] + max(func_tmpBuffer_min, min(func_tmpBuffer_max,(func_tmpBuffer * (func_tmpSpace[2]-func_tmpSpace[1])))), 
-												func_tmpSpace[2] - max(func_tmpBuffer_min, min(func_tmpBuffer_max,(func_tmpBuffer * (func_tmpSpace[2]-func_tmpSpace[1]))))) )
-								}			
-							})
+								return( c(func_tmpSpace[1] + max(func_tmpBuffer_min, min(func_tmpBuffer_max,(func_tmpBuffer * (func_tmpSpace[2]-func_tmpSpace[1])))), 
+											func_tmpSpace[2] - max(func_tmpBuffer_min, min(func_tmpBuffer_max,(func_tmpBuffer * (func_tmpSpace[2]-func_tmpSpace[1]))))) )
+								})			
+					}
 	names(func_tmpDivs) <- if(is.matrix(func_subDivs) || is.data.frame(func_subDivs)){
 								as.character(unique(func_subDivs[,1]))
 							} else {
@@ -54,7 +48,8 @@ define_plotSpace <- function(func_subDivs, func_tmpSpace = c(0,1),func_tmpBuffer
 													func_tmpBuffer = func_tmpBuffer,
 													func_tmpBuffer_max = func_tmpBuffer_max,
 													func_tmpBuffer_min = func_tmpBuffer_min,
-													func_orderDivs = func_orderDivs)
+													func_orderDivs = func_orderDivs,
+													func_pairsBeside = func_pairsBeside)
 								})
 		names(func_tmpReturn) <- names(func_tmpDivs)
 		return( func_tmpReturn )
@@ -63,3 +58,4 @@ define_plotSpace <- function(func_subDivs, func_tmpSpace = c(0,1),func_tmpBuffer
 		return( func_tmpDivs )
 	}
 }
+
