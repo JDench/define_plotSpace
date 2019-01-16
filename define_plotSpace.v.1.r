@@ -6,6 +6,11 @@
 # The last argument is to querry if we want to order the values being subdivided.
 define_plotSpace <- function(func_subDivs, func_tmpSpace = c(0,1),func_tmpBuffer = 0.1, func_tmpBuffer_max = 0.4, func_tmpBuffer_min=0.2, 
 							func_orderDivs = FALSE, func_pairsBeside = TRUE){
+	# This is a sanity check required because if we're passed a tibble, it will not act as expected
+	if(is.tibble(func_subDivs)){ 
+		func_subDivs <- as.data.frame(func_subDivs, stringsAsFactors = default.stringsAsFactors()) 
+	}
+	
 	# We define what are the divisions of space that we want to pass to each part, we add one so that this forces the division points to be boundaries
 	# between our spaces to be defined for the current func_tmpSpace
 	func_tmpDivs <- if(is.matrix(func_subDivs) || is.data.frame(func_subDivs)){
